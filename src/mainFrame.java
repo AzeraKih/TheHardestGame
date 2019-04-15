@@ -5,8 +5,6 @@ import java.awt.Rectangle;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.Color;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -43,17 +41,21 @@ public class mainFrame extends JFrame {
 	private JLabel lblQtdvida;
 	private JLabel lblAviso;
 	private JPanel pnlPoint;
-	Rectangle ob1r;
-	Rectangle ob2r;
-	Rectangle ob3r;
-	Rectangle ob4r;
-	Rectangle ob5r;
-	Rectangle po;
+	private Rectangle ob1r; //retangulo dos obstaculos em vermelho
+	private Rectangle ob2r;
+	private Rectangle ob3r;
+	private Rectangle ob4r;
+	private Rectangle ob5r;
+	private JPanel ob1; //panel dos obstaculos
+	private JPanel ob3;
+	private JPanel ob4;
+	private JPanel ob5;
+	private JPanel ob2;
+	private Rectangle po;
 
-	int delay = 1;
-	int vidas = 10;
-	int pontos = 0;
-	boolean flag = false;
+	int delay = 1; //define a velocidade do panel player
+	int vidas = 10; //define a quantidade de vidas
+	int pontos = 0; //contador dos pontos
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -61,24 +63,6 @@ public class mainFrame extends JFrame {
 				try {
 					mainFrame frame = new mainFrame();
 					frame.setVisible(true);
-					new Thread() {
-						@Override
-						public void run() {
-							while (true) {
-								try {
-									Thread.sleep(1);
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								if (!(frame.getPanel().getMousePosition() == null)) {
-									Point p = frame.getPanel().getMousePosition();
-									frame.getPlayer().setLocation((int) p.getX() - (frame.getPlayer().getWidth() / 2),
-											(int) p.getY() - (frame.getPlayer().getHeight() / 2));
-								}
-							}
-						}
-					}.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -86,11 +70,11 @@ public class mainFrame extends JFrame {
 		});
 	}
 
+	//move enquanto os botões estiverem apertados
 	final Timer Up = new Timer(delay, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			goTo(0, -1);
-
 		}
 	});
 
@@ -114,20 +98,18 @@ public class mainFrame extends JFrame {
 		}
 	});
 
+	
+	//timer para prevenir percas repetidas de vidas
 	final Timer wait = new Timer(500, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			wait.stop();
 		}
 	});
-	private JPanel ob1;
-	private JPanel ob3;
-	private JPanel ob4;
-	private JPanel ob5;
-	private JPanel ob2;
 
+	
+	//alerta o usuario no panel alert
 	public void alert(String s) {
-
 		new Thread() {
 			@Override
 			public void run() {
@@ -147,11 +129,13 @@ public class mainFrame extends JFrame {
 		}.start();
 	}
 
+	
+	//metodo para mover, verifica a jogada, caso o player perde uma vida, não move o panel e avisa perca de vida
 	public void goTo(int x, int y) {
 
+		//verifica se o timer de perca de vidas está ligado, isso previne a perca de vida repetidas vezes no mesmo momento
 		if (wait.isRunning())
 			return;
-
 		int Y = (int) Player.getLocation().getY();
 		int H = Player.getHeight() + Y;
 		int X = (int) Player.getLocation().getX();
@@ -189,6 +173,7 @@ public class mainFrame extends JFrame {
 		
 	}
 
+	//verifica se as vidas se esgotaram
 	private void perdeuVida() {
 		if (vidas <= 0) {
 			JOptionPane.showMessageDialog(null,
@@ -199,13 +184,13 @@ public class mainFrame extends JFrame {
 
 			alert("VOCE PERDEU UMA VIDA");
 			vidas--;
-			flag = false;
-			wait.start();
+			wait.start();//starta o timer preventor de perca de vidas repetidas
 		}
 
 		lblQtdvida.setText(String.valueOf(vidas));
 	}
-
+	
+	//metodo para mover aleatoriamente o panel ponto
 	private void inserirPonto() {
 		Random randomizer = new Random();
 		System.out.println(randomizer.nextInt(panel.getWidth() - 10) + 5);
@@ -434,13 +419,5 @@ public class mainFrame extends JFrame {
 		ob5r = new Rectangle((int) ob5.getLocation().getX(), (int) ob5.getLocation().getY(), (int) ob5.getWidth(),
 				(int) ob5.getHeight());
 
-	}
-
-	public JPanel getPanel() {
-		return panel;
-	}
-
-	public JPanel getPlayer() {
-		return Player;
 	}
 }
